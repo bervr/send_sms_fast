@@ -66,7 +66,7 @@ class ServerStorage:
         
     def all_campain(self):
         """Возвращает все кампании"""
-        campains = self.session.query(self.Campain)
+        campains = self.session.query(self.Campain).all()
         return campains
 
     def __init__(self, path):

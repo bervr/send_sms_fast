@@ -1,6 +1,8 @@
 import configparser
 import datetime
 import os
+import random
+
 import factory
 
 from factory import alchemy
@@ -50,8 +52,21 @@ class MessagesFactory(alchemy.SQLAlchemyModelFactory):
     status = factory.Faker('currency_code')
 
 
+class Messages2Factory(alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        model = ServerStorage.Messages
+        sqlalchemy_session = database.session  # the SQLAlchemy session object
+
+
+    user_id = random.randint(0,9)
+    campain_id = random.randint(0,9)
+    status = factory.Faker('currency_code')
+
 if __name__ == "__main__":
 
+    # for i in range(10):
+    #     database.session.add(MessagesFactory())
+    #     database.session.commit()
     for i in range(10):
-        database.session.add(MessagesFactory())
+        database.session.add(Messages2Factory())
         database.session.commit()
