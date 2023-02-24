@@ -53,6 +53,5 @@ class MessagesFactory(alchemy.SQLAlchemyModelFactory):
 if __name__ == "__main__":
 
     for i in range(10):
-        # MessagesFactory()
         database.session.add(MessagesFactory())
         database.session.commit()
