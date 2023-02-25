@@ -1,12 +1,25 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, Text,  BigInteger
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, BigInteger
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.sql import default_comparator
-import datetime
+import sqlalchemy.types as types
 
 
 Base = declarative_base()
 
+
+class ChoiceType(types.TypeDecorator):
+
+    impl = types.String
+
+    def __init__(self, choices, **kw):
+        self.choices = dict(choices)
+        super(ChoiceType, self).__init__(**kw)
+
+    def process_bind_param(self, value, dialect):
+        return [k for k, v in self.choices.iteritems() if v == value][0]
+
+    def process_result_value(self, value, dialect):
+        return self.choices[value]
 
 class ServerStorage:
     """Класс хранилища сервера"""
@@ -53,9 +66,16 @@ class ServerStorage:
         user_id = Column(ForeignKey('Users.id'))
         campain_id = Column(ForeignKey('Campain.id'))
         send_time = Column(DateTime, None)
-        status = Column(String)
+        # status = Column(String)
+        status = Column(
+            ChoiceType({"SND": "sended",
+                        "NSD": "not sended",
+                        "FLD": "failed",
+                        "DLD": "delivered"}),
+            nullable=False
+        )
 
-        def __init__(self, user_id, campain_id, status='created'):
+        def __init__(self, user_id, campain_id, status="NSD"):
             self.user_id = user_id
             self.campain_id = campain_id
             self.status = status

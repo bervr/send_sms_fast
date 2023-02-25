@@ -4,7 +4,6 @@ import os
 import random
 
 import factory
-
 from factory import alchemy
 
 
@@ -38,6 +37,8 @@ class CampainFactory(alchemy.SQLAlchemyModelFactory):
     text = factory.Faker('paragraph', nb_sentences=5)
     filter = factory.Faker('paragraph', nb_sentences=1)
 
+statuses_dict = {"SND": "sended", "NSD": "not sended", "FLD": "failed", "DLD": "delivered"}
+# statuses = [k for k, v in statuses_dict.items()]
 class MessagesFactory(alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = ServerStorage.Messages
@@ -49,8 +50,8 @@ class MessagesFactory(alchemy.SQLAlchemyModelFactory):
     user_id = factory.SelfAttribute('user.id')
 
     campain_id = factory.SelfAttribute('campain.id')
-    status = factory.Faker('currency_code')
-
+    # status = factory.fuzzy.FuzzyChoice(statuses)
+    status = factory.Iterator(statuses_dict)
 
 class Messages2Factory(alchemy.SQLAlchemyModelFactory):
     class Meta:
@@ -60,13 +61,19 @@ class Messages2Factory(alchemy.SQLAlchemyModelFactory):
 
     user_id = random.randint(0,9)
     campain_id = random.randint(0,9)
-    status = factory.Faker('currency_code')
+    # status = factory.Iterator(statuses_dict)
+
 
 if __name__ == "__main__":
-
+    for i in range(10):
+        database.session.add(UsersFactory())
+        database.session.commit()
+        database.session.add(CampainFactory())
+        database.session.commit()
+    # for i in range(10):
+    #     database.session.add(Messages2Factory())
+    #     database.session.commit()
     # for i in range(10):
     #     database.session.add(MessagesFactory())
     #     database.session.commit()
-    for i in range(10):
-        database.session.add(Messages2Factory())
-        database.session.commit()
+
